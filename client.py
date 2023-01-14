@@ -33,6 +33,7 @@ def client_program():
     while True:
         msg = input("-> ")
         if msg == "exit":
+            client.send(msg.encode(FORMAT))
             break
         elif msg == "test":
             send_file(client, "test.txt")
@@ -74,7 +75,7 @@ def client_program():
             #receive the file from the server
             #save the file in the client
 
-    client.close()
+    
 
 
 
