@@ -1,7 +1,7 @@
 import socket
 
 IP = socket.gethostbyname(socket.gethostname())
-PORT = 5000
+PORT = 5031
 ADDR = (IP, PORT)
 SIZE = 1024
 FORMAT = "utf-8"
@@ -35,20 +35,19 @@ def client_program():
         if msg == "exit":
             client.send(msg.encode(FORMAT))
             break
-        elif msg == "test":
-            send_file(client, "test.txt")
         elif msg == "ls":
             msg += f" {current_dir}"
             client.send(msg.encode(FORMAT))
             data = client.recv(SIZE).decode(FORMAT)
             print(data)
-        elif msg[0:2] == "cd ":
+        elif msg[:3] == "cd ":
             if msg[3:] == "..":
                 if current_dir == "root":
                     print("You are already in root")
                 else:
                     current_dir = current_dir[:current_dir.rfind("/")]
             else:
+                
                 current_dir = msg[3:]
                 client.send(msg.encode(FORMAT))
                 data = client.recv(SIZE).decode(FORMAT)

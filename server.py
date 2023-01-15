@@ -1,8 +1,9 @@
+import os
 import socket
 import threading
 
 IP = socket.gethostbyname(socket.gethostname())
-PORT = 5000
+PORT = 5031
 ADDR = (IP, PORT)
 SIZE = 1024
 FORMAT = "utf-8"
@@ -19,6 +20,16 @@ def receive_file(conn):
     file.close()
 
 
+def ls(conn, path):
+    files = os.listdir(path)
+    directories = ""
+    for name in files:
+        directories += f"\n{name}"
+    print(directories)
+    conn.send(directories[1:].encode(FORMAT))
+
+
+
 def handle_client(conn, addr, client_id):
     print(f"New connection: {addr} client id: {client_id}")
     connected = True
@@ -27,10 +38,9 @@ def handle_client(conn, addr, client_id):
         if msg == "exit":
             print(f"Connection from client {client_id} closed ({addr})")
             connected = False
-        elif msg == "test":
-            print("test")
-        elif msg == "ls":
+        elif msg[:3] == "ls ":
             print(f"ls {addr}")
+            ls(conn, msg[3:])
         elif msg[0:2] == "cd ":
             print("cd")
         elif msg[0:5] == "mkdir ":

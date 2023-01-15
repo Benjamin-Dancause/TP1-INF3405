@@ -1,0 +1,6 @@
+exit: exit
+ls : ls path
+cd : cd (relative_path || absolute_path)
+mkdir : mkdir name_of_folder
+upload : upload (relative_path || absolute_path)
+download : download (relative_path || absolute_path)
