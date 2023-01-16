@@ -2,7 +2,7 @@ import os
 import socket
 
 IP = socket.gethostbyname(socket.gethostname())
-PORT = 5030
+PORT = 5005
 ADDR = (IP, PORT)
 SIZE = 1024
 FORMAT = "utf-8"
@@ -53,7 +53,7 @@ def send_file(client, name, path): #don't know if file should be a path or just 
         read = file.read(SIZE)
         if not read:
             break
-        client.sendall(read)
+        client.send(read)
     
     file.close
     print("File sent")

@@ -101,7 +101,7 @@ def server_program():
     server.bind(ADDR)
 
     server.listen(10)
-    print("Server started")
+    print(f"Server started on {IP}:{PORT}")
     print("Waiting for connection...")
 
     while True:
