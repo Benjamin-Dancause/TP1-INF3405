@@ -37,9 +37,8 @@ def mkdir(client, newDir, path):
         print("Directory already exists")
 
 def send_file(client, name, path): #don't know if file should be a path or just the name for now it's just the name
-    file_size = os.path.getsize(name)
     
-    client.send(f"upload {name} {path} {file_size}".encode(FORMAT))
+    client.send(f"upload {name} {path}".encode(FORMAT))
     
     #open file
     file = open(name , "rb")
@@ -50,12 +49,14 @@ def send_file(client, name, path): #don't know if file should be a path or just 
         file.close()
         return
     
-    line = file.readline(SIZE)
-    while line:
-        client.send(line)
-        line = file.readline(SIZE)
+    while True:
+        read = file.read(SIZE)
+        if not read:
+            break
+        client.sendall(read)
     
     file.close
+    print("File sent")
 
 def client_program():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -1,7 +1,7 @@
 import os
 import socket
+import sys
 import threading
-import time
 
 IP = socket.gethostbyname(socket.gethostname())
 PORT = 5030
@@ -42,7 +42,7 @@ def mkdir(conn, newDir, path):
         conn.send("not ok".encode(FORMAT))
 
 
-def receive_file(conn, name, path, file_size):
+def receive_file(conn, name, path):
     print(f"Receiving :{name}")
     new_path = path + "/" + name
     files = os.listdir(path)
@@ -51,14 +51,13 @@ def receive_file(conn, name, path, file_size):
         return
     conn.send("ok".encode(FORMAT))
     file = open(new_path, "wb") #openeing a non existing file will create it
-    nTransfer = (int(file_size) / SIZE).__ceil__()
-    print(nTransfer)
-    while nTransfer > 0:
-        line = conn.recv(SIZE)
-        file.write(line)
-        nTransfer -= 1
-        print("nTransfer: ", nTransfer)
+    while True :
+        write = conn.recv(SIZE)
+        file.write(write)
+        if sys.getsizeof(write) < 1024: #if the size of the data is less than 1024 bytes it means that it is the last data
+            break
     file.close()
+    conn.send("ok".encode(FORMAT))
 
 
 def handle_client(conn, addr, client_id):
@@ -85,7 +84,7 @@ def handle_client(conn, addr, client_id):
         elif msg[0:7] == "upload ":
             print(f"upload {addr}")
             args = msg.split(" ")
-            receive_file(conn, args[1], args[2], args[3])
+            receive_file(conn, args[1], args[2])
         elif msg[0:9] == "download ":
             print(f"download{addr}")
         else:
