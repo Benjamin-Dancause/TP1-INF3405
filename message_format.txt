@@ -1,6 +1,10 @@
 exit: exit
 ls : ls path
-cd : cd (relative_path || absolute_path)
-mkdir : mkdir name_of_folder
-upload : upload (relative_path || absolute_path)
-download : download (relative_path || absolute_path)
+cd : cd (relative_path || absolute_path) current_dir
+mkdir : mkdir name_of_folder current_dir
+upload : upload (relative_path) current_dir
+download : download (relative_path || absolute_path) current_dir
+
+ok : ok
+not ok : not ok
+error : error
