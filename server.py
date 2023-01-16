@@ -57,7 +57,7 @@ def receive_file(conn, name, path, file_size):
         line = conn.recv(SIZE)
         file.write(line)
         nTransfer -= 1
-        time.sleep(1/10000000)#welp a print statement is faster than this
+        print()
     file.close()
 
 
