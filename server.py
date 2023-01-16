@@ -57,7 +57,7 @@ def receive_file(conn, name, path, file_size):
         line = conn.recv(SIZE)
         file.write(line)
         nTransfer -= 1
-        print()
+        print("nTransfer: ", nTransfer)
     file.close()
 
 

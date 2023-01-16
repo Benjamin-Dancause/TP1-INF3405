@@ -18,6 +18,7 @@ def cd(client, newCurrentPath, currentPath):
     if newCurrentPath == "..":
         if currentPath == "root":
             print("You are already in root")
+            return currentPath
         else:
             currentPath = currentPath[:currentPath.rfind("/")]
     else:
@@ -46,6 +47,7 @@ def send_file(client, name, path): #don't know if file should be a path or just 
     #send file name
     if client.recv(SIZE).decode(FORMAT) == "not ok":
         print("File name already exists")
+        file.close()
         return
     
     line = file.readline(SIZE)
