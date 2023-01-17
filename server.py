@@ -50,14 +50,15 @@ def receive_file(conn, name, path):
         conn.send("not ok".encode(FORMAT))
         return
     conn.send("ok".encode(FORMAT))
-    file = open(new_path, "wb") #openeing a non existing file will create it
+    file = open(new_path, "wb")
     while True :
-        write = conn.recv(SIZE)
-        file.write(write)
-        if sys.getsizeof(write) < 1024: #if the size of the data is less than 1024 bytes it means that it is the last data
+        data = conn.recv(SIZE)
+        if data[-11:] == b"End of file":
             break
+        else:
+            file.write(data)
     file.close()
-    conn.send("ok".encode(FORMAT))
+    print("File received")
 
 def send_file(conn, name, path):
     print(f"Checking : {name}")
@@ -75,7 +76,7 @@ def send_file(conn, name, path):
         conn.send(read)
     file.close
     print("File sent")
-    conn.send("ok".encode(FORMAT))
+    conn.send(b"End of file")
 
 
 def handle_client(conn, addr, client_id):

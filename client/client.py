@@ -38,14 +38,12 @@ def mkdir(client, newDir, path):
     else:
         print("Directory already exists")
 
-def send_file(client, name, path): #don't know if file should be a path or just the name for now it's just the name
+def send_file(client, name, path):
     
     client.send(f"upload {name} {path}".encode(FORMAT))
     
-    #open file
     file = open(name , "rb")
 
-    #send file name
     if client.recv(SIZE).decode(FORMAT) == "not ok":
         print("File name already exists")
         file.close()
@@ -56,8 +54,10 @@ def send_file(client, name, path): #don't know if file should be a path or just 
         if not read:
             break
         client.send(read)
-    
+
     file.close
+
+    client.send(b"End of file")
     print("File sent")
 
 def download(client, name, path):
@@ -69,11 +69,13 @@ def download(client, name, path):
     
     file = open(name, "wb")
     while True :
-        write = client.recv(SIZE)
-        file.write(write)
-        if sys.getsizeof(write) < 1024: #if the size of the data is less than 1024 bytes it means that it is the last data
+        data = client.recv(SIZE)
+        if data[-11:] == b"End of file":
             break
+        else:
+            file.write(data)
     file.close()
+    print("File downloaded")
 
 
 def client_program():
@@ -98,17 +100,16 @@ def client_program():
             print("mkdir")
             mkdir(client, msg[6:], currentDir)
 
-        elif msg[0:7] == "upload ":#need to verify if the file exists
+        elif msg[0:7] == "upload ":
             print("upload")
-            send_file(client, msg[7:], currentDir)
+            files = os.listdir()
+            if msg[7:] in files:
+                send_file(client, msg[7:], currentDir)
+            else:
+                print("File does not exist")
         elif msg[0:9] == "download ":
             print("download")
-            #send download command to the server with as a third argument the current directory
-            #send the file name to the server
             download(client, msg[9:], currentDir)
-            #receive an ok message from the server or an error message
-            #receive the file from the server
-            #save the file in the client
 
 
 
