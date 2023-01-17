@@ -4,7 +4,7 @@ import sys
 import threading
 
 IP = socket.gethostbyname(socket.gethostname())
-PORT = 5030
+PORT = 5005
 ADDR = (IP, PORT)
 SIZE = 1024
 FORMAT = "utf-8"
@@ -59,6 +59,24 @@ def receive_file(conn, name, path):
     file.close()
     conn.send("ok".encode(FORMAT))
 
+def send_file(conn, name, path):
+    print(f"Checking : {name}")
+    files = os.listdir(path)
+    if name in files:
+        conn.send("ok".encode(FORMAT))
+    else:
+        conn.send("not ok".encode(FORMAT))
+        return
+    file = open(path + "/" + name, "rb")
+    while True:
+        read = file.read(SIZE)
+        if not read:
+            break
+        conn.send(read)
+    file.close
+    print("File sent")
+    conn.send("ok".encode(FORMAT))
+
 
 def handle_client(conn, addr, client_id):
     print(f"New connection: {addr} client id: {client_id}")
@@ -87,12 +105,13 @@ def handle_client(conn, addr, client_id):
             receive_file(conn, args[1], args[2])
         elif msg[0:9] == "download ":
             print(f"download{addr}")
+            args = msg.split(" ")
+            send_file(conn, args[1], args[2])
         else:
             print(f"Command not found from {addr}")
             conn.send("Command not found".encode(FORMAT))
 
     conn.close()
-
 
 
 def server_program():

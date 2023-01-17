@@ -1,7 +1,9 @@
 import os
 import socket
+import sys
 
 IP = socket.gethostbyname(socket.gethostname())
+# IP = "192.168.1.110"
 PORT = 5005
 ADDR = (IP, PORT)
 SIZE = 1024
@@ -21,6 +23,7 @@ def cd(client, newCurrentPath, currentPath):
             return currentPath
         else:
             currentPath = currentPath[:currentPath.rfind("/")]
+            return currentPath
     else:
         client.send(f"cd {newCurrentPath} {currentPath}".encode(FORMAT))
         if client.recv(SIZE).decode(FORMAT) == "ok":
@@ -58,6 +61,22 @@ def send_file(client, name, path): #don't know if file should be a path or just 
     file.close
     print("File sent")
 
+def download(client, name, path):
+    client.send(f"download {name} {path}".encode(FORMAT))
+
+    if client.recv(SIZE).decode(FORMAT) == "not ok":
+        print("File does not exist")
+        return
+    
+    file = open(name, "wb")
+    while True :
+        write = client.recv(SIZE)
+        file.write(write)
+        if sys.getsizeof(write) < 1024: #if the size of the data is less than 1024 bytes it means that it is the last data
+            break
+    file.close()
+
+
 def client_program():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(ADDR)
@@ -87,6 +106,7 @@ def client_program():
             print("download")
             #send download command to the server with as a third argument the current directory
             #send the file name to the server
+            download(client, msg[9:], currentDir)
             #receive an ok message from the server or an error message
             #receive the file from the server
             #save the file in the client
