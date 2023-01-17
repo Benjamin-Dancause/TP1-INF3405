@@ -3,7 +3,6 @@ import socket
 import sys
 
 IP = socket.gethostbyname(socket.gethostname())
-# IP = "192.168.1.110"
 PORT = 5005
 ADDR = (IP, PORT)
 SIZE = 1024
