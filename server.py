@@ -4,13 +4,35 @@ import socket
 import threading
 import time
 
-IP = socket.gethostbyname(socket.gethostname())
-PORT = 5005
-ADDR = (IP, PORT)
 SIZE = 1024
 FORMAT = "utf-8"
 
-
+def get_address():
+    while True:
+        IP = input("Enter IP address: ")
+        bytes = IP.split(".")
+        if len(bytes) != 4:
+            print("Invalid IP address")
+            continue
+        for i in bytes:
+            if not i.isdigit():
+                print("Invalid IP address")
+                continue
+            if int(i) > 255 or int(i) < 0:
+                print("Invalid IP address")
+                continue
+        break
+    while True:
+        PORT = input("Enter port: ")
+        if not PORT.isdigit():
+            print("Invalid port")
+            continue
+        if int(PORT) < 5000 or int(PORT) > 5050:
+            print("Invalid port")
+            continue
+        PORT = int(PORT)
+        break
+    return (IP, PORT)
 
 def ls(conn, path):
     files = os.listdir(path)
@@ -105,12 +127,12 @@ def handle_client(conn, addr):
     conn.close()
 
 
-def server_program():
+def server_program(ADDR):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind(ADDR)
 
     server.listen(10)
-    print(f"Server started on {IP}:{PORT}")
+    print(f"Server started on {ADDR[0]}:{ADDR[1]}")
     print("Waiting for connection...")
 
     while True:
@@ -120,4 +142,5 @@ def server_program():
 
 
 if __name__ == '__main__':
-    server_program()
+    address = get_address()
+    server_program(address)

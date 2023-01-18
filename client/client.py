@@ -1,9 +1,6 @@
 import os
 import socket
-import sys
 
-IP = socket.gethostbyname(socket.gethostname())
-PORT = 5005
 SIZE = 1024
 FORMAT = "utf-8"
 
@@ -136,6 +133,9 @@ def client_program(ADDR):
         elif msg[0:9] == "download ":
             print("download")
             receive_file(client, msg[9:], currentDir)
+        else:
+            client.send(msg.encode(FORMAT))
+            print(client.recv(SIZE).decode(FORMAT))
 
 
 
