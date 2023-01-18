@@ -11,11 +11,6 @@ FORMAT = "utf-8"
 
 
 
-
-def send_file(conn, file):
-    pass
-
-
 def ls(conn, path):
     files = os.listdir(path)
     directories = ""
@@ -105,7 +100,7 @@ def handle_client(conn, addr, client_id):
             args = msg.split(" ")
             receive_file(conn, args[1], args[2])
         elif msg[0:9] == "download ":
-            print(f"download{addr}")
+            print(f"download {addr}")
             args = msg.split(" ")
             send_file(conn, args[1], args[2])
         else:

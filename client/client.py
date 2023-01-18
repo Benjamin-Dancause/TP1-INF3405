@@ -86,7 +86,7 @@ def send_file(client, name, path):
     client.send(b"End of file")
     print("File sent")
 
-def download(client, name, path):
+def receive_file(client, name, path):
     client.send(f"download {name} {path}".encode(FORMAT))
 
     if client.recv(SIZE).decode(FORMAT) == "not ok":
@@ -135,7 +135,7 @@ def client_program(ADDR):
                 print("File does not exist")
         elif msg[0:9] == "download ":
             print("download")
-            download(client, msg[9:], currentDir)
+            receive_file(client, msg[9:], currentDir)
 
 
 
