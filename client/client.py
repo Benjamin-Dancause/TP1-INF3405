@@ -4,10 +4,36 @@ import sys
 
 IP = socket.gethostbyname(socket.gethostname())
 PORT = 5005
-ADDR = (IP, PORT)
 SIZE = 1024
 FORMAT = "utf-8"
 
+def get_address():
+    while True:
+        IP = input("Enter IP address: ")
+        bytes = IP.split(".")
+        if len(bytes) != 4:
+            print("Invalid IP address")
+            continue
+        for i in bytes:
+            if not i.isdigit():
+                print("Invalid IP address")
+                continue
+            if int(i) > 255 or int(i) < 0:
+                print("Invalid IP address")
+                continue
+        break
+    while True:
+        PORT = input("Enter port: ")
+        if not PORT.isdigit():
+            print("Invalid port")
+            continue
+        if int(PORT) < 5000 or int(PORT) > 5050:
+            print("Invalid port")
+            continue
+        PORT = int(PORT)
+        break
+    return (IP, PORT)
+        
 
 
 def ls(client, path):
@@ -78,7 +104,7 @@ def download(client, name, path):
     print("File downloaded")
 
 
-def client_program():
+def client_program(ADDR):
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(ADDR)
     currentDir = "root"
@@ -116,4 +142,5 @@ def client_program():
 
 
 if __name__ == '__main__':
-    client_program()
+    ADDR = get_address()
+    client_program(ADDR)
