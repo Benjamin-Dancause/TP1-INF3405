@@ -1,7 +1,8 @@
+from datetime import date
 import os
 import socket
-import sys
 import threading
+import time
 
 IP = socket.gethostbyname(socket.gethostname())
 PORT = 5005
@@ -38,7 +39,6 @@ def mkdir(conn, newDir, path):
 
 
 def receive_file(conn, name, path):
-    print(f"Receiving :{name}")
     new_path = path + "/" + name
     files = os.listdir(path)
     if name in files:
@@ -53,10 +53,8 @@ def receive_file(conn, name, path):
         else:
             file.write(data)
     file.close()
-    print("File received")
 
 def send_file(conn, name, path):
-    print(f"Checking : {name}")
     files = os.listdir(path)
     if name in files:
         conn.send("ok".encode(FORMAT))
@@ -70,48 +68,44 @@ def send_file(conn, name, path):
             break
         conn.send(read)
     file.close
-    print("File sent")
     conn.send(b"End of file")
 
 
-def handle_client(conn, addr, client_id):
-    print(f"New connection: {addr} client id: {client_id}")
+def handle_client(conn, addr):
+    print(f"New connection: {addr}")
     connected = True
     while connected:
         msg = conn.recv(SIZE).decode(FORMAT)
-        print(f"Message from {addr}: {msg}")
         if msg == "exit":
-            print(f"Connection from client {client_id} closed ({addr})")
+            print(f"[{addr} - {date.today()}@{time.strftime('%H:%M:%S')} ] Connection closed")
             connected = False
         elif msg[:3] == "ls ":
-            print(f"ls {addr}")
+            print(f"[{addr} - {date.today()}@{time.strftime('%H:%M:%S')} ] ls")
             ls(conn, msg[3:])
         elif msg[0:3] == "cd ":
-            print(f"cd {addr}")
             args = msg.split(" ")
+            print(f"[{addr} - {date.today()}@{time.strftime('%H:%M:%S')} ] cd {args[1]}")
             cd(conn, args[1], args[2])
         elif msg[0:6] == "mkdir ":
-            print(f"mkdir {addr}")
-            print(msg)
             args = msg.split(" ")
+            print(f"[{addr} - {date.today()}@{time.strftime('%H:%M:%S')} ] mkdir {args[1]}")
             mkdir(conn, args[1], args[2])
         elif msg[0:7] == "upload ":
-            print(f"upload {addr}")
             args = msg.split(" ")
+            print(f"[{addr} - {date.today()}@{time.strftime('%H:%M:%S')} ] upload {args[1]}")
             receive_file(conn, args[1], args[2])
         elif msg[0:9] == "download ":
-            print(f"download {addr}")
             args = msg.split(" ")
+            print(f"[{addr} - {date.today()}@{time.strftime('%H:%M:%S')} ] download {args[1]}")
             send_file(conn, args[1], args[2])
         else:
-            print(f"Command not found from {addr}")
+            print(f"[{addr} - {date.today()}@{time.strftime('%H:%M:%S')} ] Unknown command")
             conn.send("Command not found".encode(FORMAT))
 
     conn.close()
 
 
 def server_program():
-    client_id = 0
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind(ADDR)
 
@@ -121,8 +115,7 @@ def server_program():
 
     while True:
         conn, addr = server.accept()
-        client_id += 1
-        thread = threading.Thread(target=handle_client, args=(conn, addr, client_id))
+        thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
 
 
