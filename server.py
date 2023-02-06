@@ -71,6 +71,7 @@ def receive_file(conn, name, path):
     while True :
         data = conn.recv(SIZE)
         if data[-11:] == b"End of file":
+            file.write(data[:-11])
             break
         else:
             file.write(data)
