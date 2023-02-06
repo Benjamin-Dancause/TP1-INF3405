@@ -94,6 +94,7 @@ def receive_file(client, name, path):
     while True :
         data = client.recv(SIZE)
         if data[-11:] == b"End of file":
+            file.write(data[:-11])
             break
         else:
             file.write(data)
